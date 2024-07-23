@@ -1,73 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sticky YouTube Video</title>
-  <style>
-    #video-container {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      width: 30%;
-      height: auto;
-      overflow: hidden;
-      max-width: 100%;
-      padding-bottom: 56.25%; /* 16:9 aspect ratio */
-    }
-    iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Exchange Rates</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        .rate-container {
+            display: inline-block;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .rate {
+            font-size: 2em;
+            margin: 10px 0;
+        }
+    </style>
 </head>
 <body>
-  <div id="video-container">
-    <div id="player"></div>
-  </div>
+    <h1>Real-time Exchange Rates</h1>
+    <div class="rate-container">
+        <div>1 USD to EUR: <span id="usd-eur-rate" class="rate">Loading...</span></div>
+        <div>1 USD to JPY: <span id="usd-jpy-rate" class="rate">Loading...</span></div>
+        <div>1 USD to KRW: <span id="usd-krw-rate" class="rate">Loading...</span></div>
+    </div>
 
-  <script>
-    var tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const apiKey = 'd217b5ce64af99d457e7df04';
+            const baseUrl = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`;
 
-    var player;
-    var startTime = 26; // 시작 시간 (초)
-    var endTime = 36; // 끝 시간 (초)
+            function updateRates() {
+                fetch(baseUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('usd-eur-rate').textContent = data.conversion_rates.EUR;
+                        document.getElementById('usd-jpy-rate').textContent = data.conversion_rates.JPY;
+                        document.getElementById('usd-krw-rate').textContent = data.conversion_rates.KRW;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching exchange rates:', error);
+                        document.getElementById('usd-eur-rate').textContent = 'Error';
+                        document.getElementById('usd-jpy-rate').textContent = 'Error';
+                        document.getElementById('usd-krw-rate').textContent = 'Error';
+                    });
+            }
 
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player('player', {
-        height: '100%',
-        width: '100%',
-        videoId: 'tD-MPekRiWI',
-        playerVars: {
-          'autoplay': 1,
-          'mute': 1,
-          'start': startTime,
-          'end': endTime,
-          'loop': 1,
-          'playlist': 'tD-MPekRiWI'
-        },
-        events: {
-          'onReady': onPlayerReady,
-          'onStateChange': onPlayerStateChange
-        }
-      });
-    }
-
-    function onPlayerReady(event) {
-      event.target.playVideo();
-    }
-
-    function onPlayerStateChange(event) {
-      if (event.data == YT.PlayerState.ENDED) {
-        player.seekTo(startTime);
-      }
-    }
-  </script>
+            updateRates();
+            setInterval(updateRates, 600000); // Update every 10 minutes (600,000 milliseconds)
+        });
+    </script>
 </body>
 </html>
