@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-time Exchange Rates</title>
+    <title>실시간 환율</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -24,10 +24,10 @@
     </style>
 </head>
 <body>
-    <h1>Real-time Exchange Rates</h1>
+    <h1>실시간 환율</h1>
     <div class="rate-container">
-        <div>1 USD to KRW: <span id="usd-krw-rate" class="rate">Loading...</span></div>
-        <div>1 JPY to KRW: <span id="jpy-krw-rate" class="rate">Loading...</span></div>
+        <div>1달러에 <span id="usd-krw-rate" class="rate">Loading...</span>원</div>
+        <div>1엔에 <span id="jpy-krw-rate" class="rate">Loading...</span>원</div>
     </div>
 
     <script>
@@ -36,11 +36,16 @@
             const usdUrl = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`;
             const jpyUrl = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/JPY`;
 
+            function formatNumber(number) {
+                return number.toFixed(4);
+            }
+
             function updateRates() {
                 fetch(usdUrl)
                     .then(response => response.json())
                     .then(data => {
-                        document.getElementById('usd-krw-rate').textContent = data.conversion_rates.KRW;
+                        const usdToKrw = formatNumber(data.conversion_rates.KRW);
+                        document.getElementById('usd-krw-rate').textContent = usdToKrw;
                     })
                     .catch(error => {
                         console.error('Error fetching USD to KRW exchange rate:', error);
@@ -50,7 +55,8 @@
                 fetch(jpyUrl)
                     .then(response => response.json())
                     .then(data => {
-                        document.getElementById('jpy-krw-rate').textContent = data.conversion_rates.KRW;
+                        const jpyToKrw = formatNumber(data.conversion_rates.KRW);
+                        document.getElementById('jpy-krw-rate').textContent = jpyToKrw;
                     })
                     .catch(error => {
                         console.error('Error fetching JPY to KRW exchange rate:', error);
